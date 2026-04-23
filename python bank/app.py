@@ -12,7 +12,7 @@ def create():
     accounts[accnum]={
         "name":name,
         "pin":pin,
-        "balance":1000000
+        "balance":1000
     }
     from flask import redirect,url_for
     return redirect(url_for('login_page'))
