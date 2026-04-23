@@ -12,7 +12,7 @@ def create():
     accounts[accnum]={
         "name":name,
         "pin":pin,
-        "balance":0
+        "balance":1000000
     }
     from flask import redirect,url_for
     return redirect(url_for('login_page'))
@@ -21,12 +21,23 @@ def login_page():
     return render_template('login.html')
 @app.route('/login',methods=['POST'])
 def login():
+    
     accnum = request.form['accnum']
     pin = request.form['pin']
     if accnum in accounts and accounts[accnum]['pin']==pin:
-        return f"Welcome {accounts[accnum]['name']}!login successful"
+        from flask import redirect, url_for
+        return redirect(url_for('dashboard',accnum=accnum))
+       
     else :
         return "invalid account number or pin"
+    
+@app.route('/dashboard/<accnum>')
+def dashboard(accnum):
+    user = accounts.get(accnum)
+    if user :
+        return render_template('dashboard.html',user =user,accnum=accnum)
+    else:
+        return "usernot found"
     
 if __name__=='__main__':
     app.run(debug=True) #STARTS FLASK SERVER
