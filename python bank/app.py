@@ -1,49 +1,69 @@
-from flask import *
-app = Flask(__name__) #WHERE FILES LOCATED 
-accounts = {} #STORES DATA
-@app.route('/') #LINK
+from flask import Flask, render_template, request, redirect, url_for, session
+
+app = Flask(__name__)
+app.secret_key = "secret123"
+
+# Temporary storage
+accounts = {}
+
+# ------------------ HOME ------------------
+@app.route('/')
 def home():
-    return render_template('login.html') #CONNECTS FRONT AND BACKEND
-@app.route('/createpage')
+    return redirect(url_for('login'))
 
-def createpage():
-    return render_template('createpage.html')
-
-
-
-@app.route('/create',methods=["post"]) #HANDLES FORM SUBMISSION AND DATA COMING FROM USER
+# ------------------ CREATE ACCOUNT ------------------
+@app.route('/create', methods=['GET', 'POST'])
 def create():
-    name=request.form['name']
-    accnum = request.form['accnum']
-    pin = request.form['pin']
-    accounts[accnum]={
-        "name":name,
-        "pin":pin,
-        "balance":1000
-    }
-    
-    return redirect(url_for('dashboard',accnum=accnum))
-                            
+    if request.method == 'POST':
+        name = request.form['name']
+        accnum = request.form['accnum']
+        pin = request.form['pin']
 
-@app.route('/login',methods=['POST'])
+        if accnum in accounts:
+            return "Account already exists!"
+
+        accounts[accnum] = {
+            "name": name,
+            "pin": pin,
+            "balance": 1000
+        }
+
+        return redirect(url_for('login'))
+
+    return render_template('create.html')
+
+# ------------------ LOGIN ------------------
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    
-    accnum = request.form['accnum']
-    pin = request.form['pin']
-    if accnum in accounts and accounts[accnum]['pin']==pin:
-        from flask import redirect, url_for
-        return redirect(url_for('dashboard',accnum=accnum))
-       
-    else :
-        return "invalid account number or pin"
-    
-@app.route('/dashboard/<accnum>')
-def dashboard(accnum):
-    user = accounts.get(accnum)
-    if user :
-        return render_template('dashboard.html',user=user,accnum=accnum)
-    else:
-        return "usernot found"
-    
-if __name__=='__main__':
-    app.run(debug=True) #STARTS FLASK SERVER
+    if request.method == 'POST':
+        accnum = request.form['accnum']
+        pin = request.form['pin']
+
+        if accnum in accounts and accounts[accnum]['pin'] == pin:
+            session['user'] = accnum
+            return redirect(url_for('dashboard'))
+        else:
+            return "Invalid account number or pin"
+
+    return render_template('login.html')
+
+# ------------------ DASHBOARD ------------------
+@app.route('/dashboard')
+def dashboard():
+    if 'user' in session:
+        accnum = session['user']
+        user = accounts.get(accnum)
+
+        return render_template('dashboard.html', user=user, accnum=accnum)
+
+    return redirect(url_for('login'))
+
+# ------------------ LOGOUT ------------------
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
+
+# ------------------ RUN APP ------------------
+if __name__ == '__main__':
+    app.run(debug=True)
