@@ -35,6 +35,7 @@ def create():
 # ------------------ LOGIN ------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+<<<<<<< HEAD
     if request.method == 'POST':
         accnum = request.form['accnum']
         pin = request.form['pin']
@@ -67,3 +68,44 @@ def logout():
 # ------------------ RUN APP ------------------
 if __name__ == '__main__':
     app.run(debug=True)
+=======
+    
+    accnum = request.form['accnum']
+    pin = request.form['pin']
+    if accnum in accounts and accounts[accnum]['pin']==pin:
+        from flask import redirect, url_for
+        return redirect(url_for('dashboard',accnum=accnum))
+       
+    else :
+        return "invalid account number or pin"
+    
+@app.route('/dashboard/<accnum>')
+def dashboard(accnum):
+    user = accounts.get(accnum)
+    if user :
+        return render_template('dashboard.html',user=user,accnum=accnum)
+    else:
+        return "usernot found"
+@app.route('/deposit/<accnum>',methods=['post'])
+def deposit(accnum):
+    user = accounts.get(accnum)
+    if user:amount=int(request.form['amount'])
+    user['balance'] += amount
+    return redirect(url_for('dashboard',accnum=accnum))
+
+
+@app.route('/withdraw/<accnum>',methods=['post'])
+def withdraw(accnum):
+    user= accounts.get(accnum)
+    if user:amount=int(request.form['amount'])
+    if amount <= user['balance']:
+        user['balance'] -=amount
+        return redirect(url_for('dashboard',accnum=accnum))
+    else:
+        return "insufficient balance"
+        return "user not found"    
+if __name__=='__main__':
+    app.run(debug=True) #STARTS FLASK SERVER
+
+
+>>>>>>> 3b614fa219de6b377c3063dd3f4ab73bc1f38dcb

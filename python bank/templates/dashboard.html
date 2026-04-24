@@ -2,11 +2,26 @@
 <html>
 
 <body>
+<<<<<<< HEAD
     <h2>Welcome {{ user.name }}</h2>
     <p>Account Number: {{accnum }}</p>
     <p>Balance: {{ user.balance }}</p>
     <br>
     <a href="/logout">Logout</a>
+=======
+<h2>Welcome {{ user.name }}</h2>
+<p>Account Number: {{accnum }}</p>
+<p>Balance: {{ user.balance  }}</p>
+<form action="/deposit/{{accnum}}" method="Post">
+    <input type="number" name="amount" placeholder="Enter amount to deposit" required>
+    <button type="submit">deposit</button>
+</form>
+<form action="/withdraw/{{accnum}}" method="Post">
+    <input type="number" name="amount" placeholder="Enter amount towithdraw"required>
+    <button type="submit">withdraw</button>
+</form>
+
+>>>>>>> 3b614fa219de6b377c3063dd3f4ab73bc1f38dcb
 </body>
 
 </html>
