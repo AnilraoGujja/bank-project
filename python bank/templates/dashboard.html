@@ -4,5 +4,14 @@
 <h2>Welcome {{ user.name }}</h2>
 <p>Account Number: {{accnum }}</p>
 <p>Balance: {{ user.balance  }}</p>
+<form action="/deposit/{{accnum}}" method="Post">
+    <input type="number" name="amount" placeholder="Enter amount to deposit" required>
+    <button type="submit">deposit</button>
+</form>
+<form action="/withdraw/{{accnum}}" method="Post">
+    <input type="number" name="amount" placeholder="Enter amount towithdraw"required>
+    <button type="submit">withdraw</button>
+</form>
+
 </body>
 </html>

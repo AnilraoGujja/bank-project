@@ -44,6 +44,25 @@ def dashboard(accnum):
         return render_template('dashboard.html',user=user,accnum=accnum)
     else:
         return "usernot found"
-    
+@app.route('/deposit/<accnum>',methods=['post'])
+def deposit(accnum):
+    user = accounts.get(accnum)
+    if user:amount=int(request.form['amount'])
+    user['balance'] += amount
+    return redirect(url_for('dashboard',accnum=accnum))
+
+
+@app.route('/withdraw/<accnum>',methods=['post'])
+def withdraw(accnum):
+    user= accounts.get(accnum)
+    if user:amount=int(request.form['amount'])
+    if amount <= user['balance']:
+        user['balance'] -=amount
+        return redirect(url_for('dashboard',accnum=accnum))
+    else:
+        return "insufficient balance"
+        return "user not found"    
 if __name__=='__main__':
     app.run(debug=True) #STARTS FLASK SERVER
+
+
