@@ -3,7 +3,14 @@ app = Flask(__name__) #WHERE FILES LOCATED
 accounts = {} #STORES DATA
 @app.route('/') #LINK
 def home():
-    return render_template('home.html') #CONNECTS FRONT AND BACKEND
+    return render_template('login.html') #CONNECTS FRONT AND BACKEND
+@app.route('/createpage')
+
+def createpage():
+    return render_template('createpage.html')
+
+
+
 @app.route('/create',methods=["post"]) #HANDLES FORM SUBMISSION AND DATA COMING FROM USER
 def create():
     name=request.form['name']
@@ -12,13 +19,12 @@ def create():
     accounts[accnum]={
         "name":name,
         "pin":pin,
-        "balance":1000000
+        "balance":1000
     }
-    from flask import redirect,url_for
-    return redirect(url_for('login_page'))
-@app.route('/login')
-def login_page():
-    return render_template('login.html')
+    
+    return redirect(url_for('dashboard',accnum=accnum))
+                            
+
 @app.route('/login',methods=['POST'])
 def login():
     
@@ -35,7 +41,7 @@ def login():
 def dashboard(accnum):
     user = accounts.get(accnum)
     if user :
-        return render_template('dashboard.html',user =user,accnum=accnum)
+        return render_template('dashboard.html',user=user,accnum=accnum)
     else:
         return "usernot found"
     
