@@ -4,21 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>Create Account</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 5px rgba(79, 172, 254, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #4facfe;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #00c6ff;
+        }
+    </style>
 </head>
 
 <body>
 
-    <h1>Create Account</h1>
-    <form action="/create" method="post">
-        Name:<input type="text" name="name"><br><br>
-        Account No:<input type="text" name="accnum"><br><br>
-        PIN: <input type="password" name="pin"><br><br>
+    <div class="container">
+        <h1>Create Account</h1>
 
+        <form action="/create" method="post">
+            <input type="text" name="name" placeholder="Enter Name" required>
+            <input type="text" name="accnum" placeholder="Account Number" required>
+            <input type="password" name="pin" placeholder="PIN" required>
 
-        <button type="Submit" class="Submit">Submit</button>
-    </form>
+            <button type="submit">Create Account</button>
+        </form>
+    </div>
+
 </body>
 
 </html>

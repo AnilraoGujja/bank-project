@@ -1,27 +1,144 @@
 <!DOCTYPE html>
 <html>
 
-<body>
-<<<<<<< HEAD
-    <h2>Welcome {{ user.name }}</h2>
-    <p>Account Number: {{accnum }}</p>
-    <p>Balance: {{ user.balance }}</p>
-    <br>
-    <a href="/logout">Logout</a>
-=======
-<h2>Welcome {{ user.name }}</h2>
-<p>Account Number: {{accnum }}</p>
-<p>Balance: {{ user.balance  }}</p>
-<form action="/deposit/{{accnum}}" method="Post">
-    <input type="number" name="amount" placeholder="Enter amount to deposit" required>
-    <button type="submit">deposit</button>
-</form>
-<form action="/withdraw/{{accnum}}" method="Post">
-    <input type="number" name="amount" placeholder="Enter amount towithdraw"required>
-    <button type="submit">withdraw</button>
-</form>
+<head>
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            margin: 0;
+            padding: 0;
+        }
 
->>>>>>> 3b614fa219de6b377c3063dd3f4ab73bc1f38dcb
+        .container {
+            width: 400px;
+            margin: 80px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        p {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 95%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        .withdraw-btn {
+            background: #e74c3c;
+        }
+
+        .toggle-btn {
+            background: #3498db;
+            margin-top: 5px;
+        }
+
+        .logout {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: white;
+            background: #333;
+            padding: 8px 15px;
+            border-radius: 6px;
+        }
+
+        .section {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Welcome {{ user.name }}</h2>
+        <p><strong>Account Number:</strong> {{ accnum }}</p>
+
+        <!-- Hidden Balance -->
+        <p>
+            <strong>Balance:</strong>
+            <span id="balance">******</span>
+
+            <!-- Eye Icon -->
+            <span onclick="toggleBalance()" id="eye" style="cursor:pointer; margin-left:10px; font-size:18px;">
+                👁️
+            </span>
+        </p>
+        <div class="section">
+            <form action="/deposit/{{accnum}}" method="POST">
+                <input type="number" name="amount" placeholder="Enter amount to deposit" required>
+                <button type="submit">Deposit</button>
+            </form>
+        </div>
+
+        <div class="section">
+
+            <form action="/withdraw/{{accnum}}" method="POST">
+                <input type="number" name="amount" placeholder="Enter amount to withdraw" required>
+                <button type="submit" class="withdraw-btn">Withdraw</button>
+            </form>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <p style="color: {% if category == 'error' %} red {% else %} green {% endif %};
+                          font-weight: bold;">
+                {{ message }}
+            </p>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <a href="/logout" class="logout">Logout</a>
+    </div>
+
+    <script>
+        let visible = false;
+        const actualBalance = "₹{{ user.balance }}";
+
+        function toggleBalance() {
+            const balanceField = document.getElementById("balance");
+            const eye = document.getElementById("eye");
+
+            if (visible) {
+                balanceField.innerText = "******";
+                eye.innerText = "👁️";   // closed/hidden state
+            } else {
+                balanceField.innerText = actualBalance;
+                eye.innerText = "🙈";   // open/visible state
+            }
+
+            visible = !visible;
+        }
+    </script>
+
 </body>
 
 </html>

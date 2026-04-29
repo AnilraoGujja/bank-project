@@ -1,18 +1,86 @@
-<!DOCTYPE>
+<!DOCTYPE html>
 <html>
+
+<head>
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 300px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #4facfe;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #00c6ff;
+        }
+
+        a {
+            text-decoration: none;
+            color: #4facfe;
+            font-size: 14px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
 
 <body>
 
-    <h2>Login Page</h2>
-    <form action="/login" method="post">
-        Account No:<input type="text" name="accnum"><br><br>
-        PIN:<input type="password" name="pin"><br><br>
-        <button type="submit">Login</button>
-    </form>
-    <br>
-    <a href="/create">New user? Create Account
+    <div class="container">
+        <h2>Login Details</h2>
 
-    </a>
+        <form action="/login" method="post">
+            <input type="text" name="accnum" placeholder="Account Number" required>
+            <input type="password" name="pin" placeholder="PIN" required>
+
+            {% if error %}
+            <p style="color:red;">{{ error }}</p>
+            {% endif %}
+            <button type="submit">Login</button>
+        </form>
+
+        <br>
+        <a href="/create">New user? Create Account</a>
+    </div>
 
 </body>
 
