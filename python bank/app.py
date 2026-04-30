@@ -169,6 +169,29 @@ def withdraw(accnum):
 
     return redirect(url_for('dashboard'))
 
+@app.route('/transfer/<accnum>', methods=['POST'])
+def transfer(accnum):
+    sender = accounts.get(accnum)
+    receiver_acc = request.form['to_acc']
+    amount = int(request.form['amount'])
+
+    receiver = accounts.get(receiver_acc)
+
+    if not sender:
+        return "Sender not found"
+
+    if not receiver:
+        return "Receiver not found"
+
+    if sender['balance'] < amount:
+        return "Insufficient balance"
+
+    # Transfer logic
+    sender['balance'] -= amount
+    receiver['balance'] += amount
+
+    return redirect(url_for('dashboard', accnum=accnum))
+
 # ------------------ LOGOUT ------------------
 @app.route('/logout')
 def logout():
