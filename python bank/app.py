@@ -1,22 +1,28 @@
 from flask import *
-import os,json
+import os, json
+import random, time
 
 app = Flask(__name__)
 app.secret_key = "secret123"
-# Temporary storage
 
+# ------------------ OTP FUNCTION ------------------
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+# ------------------ STORAGE ------------------
 def load_accounts():
     if os.path.exists('accounts.json'):
         try:
             with open('accounts.json', 'r') as f:
                 return json.load(f)
         except json.JSONDecodeError:
-            return{}
+            return {}
     return {}
 
 def save_accounts(accounts):
     with open('accounts.json', 'w') as f:
-        json.dump(accounts,f, indent=4)
+        json.dump(accounts, f, indent=4)
+
 accounts = load_accounts()
 
 # ------------------ HOME ------------------
@@ -28,9 +34,9 @@ def home():
 @app.route('/create', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
-        name = request.form['name']
-        accnum = request.form['accnum']
-        pin = request.form['pin']
+        name = request.form.get('name')
+        accnum = request.form.get('accnum')
+        pin = request.form.get('pin')
 
         if accnum in accounts:
             return "Account already exists!"
@@ -42,74 +48,133 @@ def create():
         }
 
         save_accounts(accounts)
-
         return redirect(url_for('login'))
 
     return render_template('create.html')
 
-# ------------------ LOGIN ------------------
+# ------------------ LOGIN WITH OTP ------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
+    show_otp = False
+
+    # Reset OTP on fresh visit
+    if request.method == 'GET':
+        session.pop('otp', None)
+        session.pop('otp_time', None)
+        session.pop('temp_user', None)
 
     if request.method == 'POST':
-        accnum = request.form['accnum']
-        pin = request.form['pin']
 
-        if accnum in accounts and accounts[accnum]['pin'] == pin:
-            session['user'] = accnum
-            return redirect(url_for('dashboard'))
+        # ---------------- STEP 1: LOGIN ----------------
+        if 'otp' not in session:
+            accnum = request.form.get('accnum')
+            pin = request.form.get('pin')
+
+            if accnum in accounts and accounts[accnum]['pin'] == pin:
+                otp = generate_otp()
+
+                session['otp'] = otp
+                session['otp_time'] = time.time()
+                session['temp_user'] = accnum
+
+                print("Your OTP is:", otp)  # Replace with SMS
+
+                show_otp = True
+            else:
+                error = "Invalid account number or pin"
+
+        # ---------------- STEP 2: OTP VERIFY ----------------
         else:
-            error = "Invalid account number or pin"
+            show_otp = True
+            otp_input = request.form.get('otp')
 
-    return render_template('login.html', error=error)
+            if not otp_input:
+                error = "Please enter OTP"
+
+            elif time.time() - session.get('otp_time', 0) > 300:
+                error = "OTP expired"
+                session.clear()
+
+            elif otp_input == session.get('otp'):
+                session['user'] = session['temp_user']
+
+                # Clear temp session data
+                session.pop('temp_user', None)
+                session.pop('otp', None)
+                session.pop('otp_time', None)
+
+                return redirect(url_for('dashboard'))
+            else:
+                error = "Invalid OTP"
+
+    return render_template('login.html', error=error, show_otp=show_otp)
 
 # ------------------ DASHBOARD ------------------
 @app.route('/dashboard')
 def dashboard():
-    if 'user' in session:
-        accnum = session['user']
-        user = accounts.get(accnum)
+    if 'user' not in session:
+        return redirect(url_for('login'))
 
-        return render_template('dashboard.html', user=user, accnum=accnum)
-
-    return redirect(url_for('login'))
-
-@app.route('/deposit/<accnum>',methods=['POST'])
-def deposit(accnum):
+    accnum = session['user']
     user = accounts.get(accnum)
-    if user:
-        amount=int(request.form['amount'])
-        user['balance'] += amount
-        
-        save_accounts(accounts)
 
-    return redirect(url_for('dashboard',accnum=accnum))
+    return render_template('dashboard.html', user=user, accnum=accnum)
 
+# ------------------ DEPOSIT ------------------
+@app.route('/deposit/<accnum>', methods=['POST'])
+def deposit(accnum):
+    if 'user' not in session or session['user'] != accnum:
+        return redirect(url_for('login'))
 
-@app.route('/withdraw/<accnum>',methods=['POST'])
+    user = accounts.get(accnum)
+
+    try:
+        amount = int(request.form.get('amount', 0))
+        if amount > 0:
+            user['balance'] += amount
+            save_accounts(accounts)
+            flash("Deposit successful", "success")
+        else:
+            flash("Enter valid amount", "error")
+    except:
+        flash("Invalid input", "error")
+
+    return redirect(url_for('dashboard'))
+
+# ------------------ WITHDRAW ------------------
+@app.route('/withdraw/<accnum>', methods=['POST'])
 def withdraw(accnum):
-    user= accounts.get(accnum)
-    if not user:
-        flash("User not found", "error")
-        return redirect(url_for('dashboard',accnum=accnum))
-    amount = int(request.form['amount'])
-    if amount <= user['balance']:
-        user['balance'] -= amount
-        save_accounts(accounts)
+    if 'user' not in session or session['user'] != accnum:
+        return redirect(url_for('login'))
 
-        flash("Withdrawal succcessful", "success")
-    else:
-        flash ("insufficient balance","error")
+    user = accounts.get(accnum)
 
-    return redirect(url_for('dashboard',accnum=accnum))
+    try:
+        amount = int(request.form.get('amount', 0))
+
+        if amount <= 0:
+            flash("Enter valid amount", "error")
+
+        elif amount <= user['balance']:
+            user['balance'] -= amount
+            save_accounts(accounts)
+            flash("Withdrawal successful", "success")
+
+        else:
+            flash("Insufficient balance", "error")
+
+    except:
+        flash("Invalid input", "error")
+
+    return redirect(url_for('dashboard'))
 
 # ------------------ LOGOUT ------------------
 @app.route('/logout')
 def logout():
-    session.pop('user', None)
+    session.clear()
     return redirect(url_for('login'))
 
-# ------------------ RUN APP ------------------
+# ------------------ RUN ------------------
 if __name__ == '__main__':
     app.run(debug=True)

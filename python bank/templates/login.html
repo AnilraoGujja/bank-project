@@ -36,6 +36,27 @@
             border: 1px solid #ccc;
         }
 
+        /* 🔹 OTP BOX STYLE */
+        .otp-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .otp-box {
+            width: 40px;
+            height: 45px;
+            text-align: center;
+            font-size: 18px;
+            border: none;
+            border-bottom: 2px solid #ccc;
+            outline: none;
+        }
+
+        .otp-box:focus {
+            border-bottom: 2px solid #4facfe;
+        }
+
         button {
             width: 100%;
             padding: 10px;
@@ -68,19 +89,38 @@
     <div class="container">
         <h2>Login Details</h2>
 
-        <form action="/login" method="post">
+        <form method="POST">
+            {% if show_otp %}
+            <input type="text" name="otp" placeholder="Enter OTP" required>
+            {% else %}
             <input type="text" name="accnum" placeholder="Account Number" required>
             <input type="password" name="pin" placeholder="PIN" required>
-
-            {% if error %}
-            <p style="color:red;">{{ error }}</p>
             {% endif %}
-            <button type="submit">Login</button>
+            <button type="submit">Submit</button>
         </form>
 
         <br>
         <a href="/create">New user? Create Account</a>
     </div>
+
+    <!-- 🔹 AUTO MOVE OTP CURSOR -->
+    <script>
+        const inputs = document.querySelectorAll(".otp-box");
+
+        inputs.forEach((input, index) => {
+            input.addEventListener("input", () => {
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && index > 0 && input.value === "") {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+    </script>
 
 </body>
 
