@@ -1,13 +1,18 @@
 {
+<<<<<<< HEAD
+=======
     "123456": {
         "name": "anand reddy",
         "pin": "12345",
         "balance": 1000
     },
+>>>>>>> e13eec3f10ba947607fd4f4040293e2911bf14fe
     "6850": {
         "name": "Anilrao",
         "pin": "2982",
         "balance": 11000
+<<<<<<< HEAD
+=======
     },
     "12345": {
         "name": "abhi",
@@ -18,5 +23,6 @@
         "name": "affan",
         "pin": "5318",
         "balance": 1400
+>>>>>>> e13eec3f10ba947607fd4f4040293e2911bf14fe
     }
 }
