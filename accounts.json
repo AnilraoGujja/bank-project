@@ -2,6 +2,26 @@
     "1234567": {
         "name": "ramesh",
         "pin": "1234567",
+        "balance": 1500
+    },
+    "9490": {
+        "name": "Anilrao",
+        "pin": "1",
+        "balance": 10500
+    },
+    "798": {
+        "name": "Rajashekar",
+        "pin": "1",
         "balance": 1000
+    },
+    "8688": {
+        "name": "Santhosh",
+        "pin": "1",
+        "balance": 500
+    },
+    "6850": {
+        "name": "Anilrao",
+        "pin": "1",
+        "balance": 4500
     }
 }

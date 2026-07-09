@@ -5,32 +5,29 @@ import random, time
 app = Flask(__name__)
 app.secret_key = "secret123"
 
-# ------------------ OTP FUNCTION ------------------
 def generate_otp():
     return str(random.randint(100000, 999999))
 
-# ------------------ STORAGE ------------------
 def load_accounts():
     if os.path.exists('accounts.json'):
         try:
             with open('accounts.json', 'r') as f:
-                return json.load(f)
-        except json.JSONDecodeError:
-            return {}
-    return {}
 
+                return json.load(f) 
+        except json.JSONDecodeError:
+            return {}       
+    return {}
+ 
 def save_accounts(accounts):
     with open('accounts.json', 'w') as f:
         json.dump(accounts, f, indent=4)
 
 accounts = load_accounts()
 
-# ------------------ HOME ------------------
 @app.route('/')
 def home():
     return redirect(url_for('login'))
 
-# ------------------ CREATE ACCOUNT ------------------
 @app.route('/create', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
@@ -46,19 +43,18 @@ def create():
             "pin": pin,
             "balance": 1000
         }
-
         save_accounts(accounts)
         return redirect(url_for('login'))
 
     return render_template('create.html')
 
-# ------------------ LOGIN WITH OTP ------------------
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
     show_otp = False
 
-    # Reset OTP on fresh visit
+  
     if request.method == 'GET':
         session.pop('otp', None)
         session.pop('otp_time', None)
@@ -66,7 +62,6 @@ def login():
 
     if request.method == 'POST':
 
-        # ---------------- STEP 1: LOGIN ----------------
         if 'otp' not in session:
             accnum = request.form.get('accnum')
             pin = request.form.get('pin')
@@ -82,9 +77,7 @@ def login():
 
                 show_otp = True
             else:
-                error = "Invalid account number or pin"
-
-        # ---------------- STEP 2: OTP VERIFY ----------------
+                error = "Invalid account number or pin"      
         else:
             show_otp = True
             otp_input = request.form.get('otp')
@@ -98,7 +91,7 @@ def login():
 
             elif otp_input == session.get('otp'):
                 session['user'] = session['temp_user']
-
+ 
                 # Clear temp session data
                 session.pop('temp_user', None)
                 session.pop('otp', None)
@@ -110,9 +103,8 @@ def login():
 
     return render_template('login.html', error=error, show_otp=show_otp)
 
-# ------------------ DASHBOARD ------------------
 @app.route('/dashboard')
-def dashboard():
+def dashboard(): 
     if 'user' not in session:
         return redirect(url_for('login'))
 
@@ -121,7 +113,6 @@ def dashboard():
 
     return render_template('dashboard.html', user=user, accnum=accnum)
 
-# ------------------ DEPOSIT ------------------
 @app.route('/deposit/<accnum>', methods=['POST'])
 def deposit(accnum):
     if 'user' not in session or session['user'] != accnum:
@@ -142,7 +133,6 @@ def deposit(accnum):
 
     return redirect(url_for('dashboard'))
 
-# ------------------ WITHDRAW ------------------
 @app.route('/withdraw/<accnum>', methods=['POST'])
 def withdraw(accnum):
     if 'user' not in session or session['user'] != accnum:
@@ -186,18 +176,19 @@ def transfer(accnum):
     if sender['balance'] < amount:
         return "Insufficient balance"
 
-    # Transfer logic
+    
     sender['balance'] -= amount
     receiver['balance'] += amount
 
+    save_accounts(accounts)
     return redirect(url_for('dashboard', accnum=accnum))
 
-# ------------------ LOGOUT ------------------
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# ------------------ RUN ------------------
 if __name__ == '__main__':
     app.run(debug=True)
+ 
+ 
